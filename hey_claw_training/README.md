@@ -188,6 +188,55 @@ if not hasattr(torchaudio, "info"):
     torchaudio.info = _info
 ```
 
+## Deploying to zeroclaw
+
+The model is consumed by [zeroclaw](https://github.com/justbry/zeroclaw), which looks for
+wake word models in `~/.zeroclaw/openwakeword/`.
+
+### Deploy
+
+Copy both ONNX files (the model splits into a small graph file and a separate weights file):
+
+```bash
+cp output/hey_claw.onnx output/hey_claw.onnx.data ~/.zeroclaw/openwakeword/
+```
+
+### zeroclaw config
+
+In `~/.zeroclaw/config.toml`, the voice channel is configured to use this model:
+
+```toml
+[channels_config.voice]
+wake_word = "hey claw"
+wake_score_threshold = 0.020
+wake_trigger_streak = 1
+wake_model_path = "/Users/rmac/.zeroclaw/openwakeword"
+wake_classifier = "hey_claw.onnx"
+use_system_tts = true
+say_voice = "Lee (Premium)"
+whisper_model_path = "/Users/rmac/.cache/whisper/ggml-base.bin"
+```
+
+Key settings:
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| `wake_score_threshold` | `0.020` | Detection threshold (0-1). Lower = more sensitive, more false positives. |
+| `wake_trigger_streak` | `1` | Consecutive frames above threshold needed to trigger. Raise to reduce false positives. |
+| `wake_classifier` | `hey_claw.onnx` | Filename inside `wake_model_path`. |
+
+### Verify deployment
+
+```bash
+ls ~/.zeroclaw/openwakeword/
+# should show: hey_claw.onnx  hey_claw.onnx.data  embedding_model.onnx  melspectrogram.onnx
+```
+
+The backbone models (`embedding_model.onnx`, `melspectrogram.onnx`) are shared across all
+wake word models and should already be present from a standard zeroclaw install.
+
+---
+
 ## Files in this directory
 
 | File | Purpose |
