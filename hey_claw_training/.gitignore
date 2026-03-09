@@ -1,0 +1,17 @@
+# Large downloaded datasets - download separately per README
+libritts_r-medium.onnx
+libritts_r-medium.onnx.json
+openwakeword_features_ACAV100M_2000_hrs_16bit.npy
+validation_set_features.npy
+mit_rirs/
+fma/
+audioset/
+audioset_16k/
+piper/
+piper.tar.gz
+
+# Generated training clips (reproduced by generate_clips_piper.py)
+output/hey_claw/
+
+# Virtual environment
+.venv/
